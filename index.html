@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DALME Ladder Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { height: 100vh; width: 100%; }
+        .leaflet-popup-content-wrapper { font-family: sans-serif; }
+        .popup-title { font-weight: bold; font-size: 1.1em; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script>
+        // Initialize the map centered on Europe
+        const map = L.map('map').setView([45, 10], 5);
+
+        // Add OpenStreetMap tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Your CSV Data transformed into a JSON array
+        const ladderData = [
+          { "item": "ladder", "owner": "Guillelmus Egidii", "description": "una scale fuste", "location": "in the upper room of the house", "link": "https://dalme.org/collections/records/30904c6f-334d-470d-adcb-30d003f6aa69/114r/", "date": "1347", "address": "Marseille", "lat": 43.3025742, "lng": 5.3690743 },
+          { "item": "ladder", "owner": "Berengarius de Bulbono", "description": "una parva scala ad assendendum supra tinam", "location": "above the roof", "link": "https://dalme.org/collections/records/9e7b8e5b-681b-41ab-8818-6e8894ced204/10r/", "date": "1361", "address": "Arles", "lat": 43.676647, "lng": 4.6277769 },
+          { "item": "ladder", "owner": "Francesc Giner", "description": "una scala de IIII scalons", "location": "In the bedroom of the deceased", "link": "https://dalme.org/collections/records/585c23dd-6fe3-458f-a911-64f128c4068a/29/", "date": "1381", "address": "Valencia", "lat": 39.4738338, "lng": -0.3756348 },
+          { "item": "ladder", "owner": "Deo di Vanni", "description": "1 scala", "location": "in an upper room", "link": "https://dalme.org/collections/florentine-wards/records/c9873d0f-78f8-4a80-8894-429b10c0e7c4/7r/", "date": "1386", "address": "Florence", "lat": 43.7699685, "lng": 11.2576701 },
+          { "item": "ladder", "owner": "Deo di Vanni", "description": "1 scala", "location": "on the ground floor room", "link": "https://dalme.org/collections/florentine-wards/records/c9873d0f-78f8-4a80-8894-429b10c0e7c4/7v/", "date": "1386", "address": "Florence", "lat": 43.7699685, "lng": 11.2576706 },
+          { "item": "ladder", "owner": "Deo di Vanni", "description": "1 scala a pivoli", "location": "in the kitchen", "link": "https://dalme.org/collections/florentine-wards/records/c9873d0f-78f8-4a80-8894-429b10c0e7c4/8v/", "date": "1386", "address": "Florence", "lat": 43.7699685, "lng": 11.2576706 },
+          { "item": "ladder", "owner": "Tomaso di Firenze", "description": "fuori 1 scala", "location": "outside of the clothing shop in via Santa Maria", "link": "https://dalme.org/collections/florentine-wards/records/1f82a79c-9593-4078-b622-e98a7085d108/389v/", "date": "1390", "address": "Florence", "lat": 43.7699685, "lng": 11.2576704 },
+          { "item": "ladder", "owner": "Tomaso di Firenze", "description": "1 scala braccia 5", "location": "in the courtyard", "link": "https://dalme.org/collections/florentine-wards/records/1f82a79c-9593-4078-b622-e98a7085d108/390r/", "date": "1390", "address": "Florence", "lat": 43.7699685, "lng": 11.2576703 },
+          { "item": "ladder", "owner": "Tomaso di Firenze", "description": "1 scala per la colombaia", "location": "in the room above the dovecote", "link": "https://dalme.org/collections/florentine-wards/records/1f82a79c-9593-4078-b622-e98a7085d108/390v/", "date": "1390", "address": "Florence", "lat": 43.7699685, "lng": 11.2576702 },
+          { "item": "ladder", "owner": "Beatrix Ruffe", "description": "unam scalam longitudinis vigintiquatuor palmorum", "location": "home of carpenter Arnulphus Ruffi", "link": "https://dalme.org/collections/records/b5be1145-30bb-4c57-a764-c5fe9aa4eff0/104v/", "date": "1410", "address": "Marseille", "lat": 43.3025742, "lng": 5.3690743 },
+          { "item": "ladder", "owner": "Beatrix Ruffe", "description": "Item unam [scalam] aliam scalam longitudinis duarum cannarum", "location": "home of carpenter Arnulphus Ruffi", "link": "https://dalme.org/collections/records/b5be1145-30bb-4c57-a764-c5fe9aa4eff0/104v/", "date": "1410", "address": "Marseille", "lat": 43.3025742, "lng": 5.3690743 },
+          { "item": "ladder", "owner": "Beatrix Ruffe", "description": "unam [scalam] aliam longitudinis duodecim palmorum", "location": "home of carpenter Arnulphus Ruffi", "link": "https://dalme.org/collections/records/b5be1145-30bb-4c57-a764-c5fe9aa4eff0/104v/", "date": "1410", "address": "Marseille", "lat": 43.3025742, "lng": 5.3690743 },
+          { "item": "ladder", "owner": "Montcalieri Castle", "description": "scalam unam corde pro scalamento", "location": "in armory", "link": "https://dalme.org/collections/records/bf86aaf2-a9a6-4ba2-8b96-f52b48c3f7d5/29r/", "date": "1416", "address": "Lombardy", "lat": 45.4790671, "lng": 9.8452433 },
+          { "item": "ladder", "owner": "Ramon de Sant Martí", "description": "una scala de fust de tres scalons abt e per muntar blat als graners", "location": "in granary", "link": "https://dalme.org/collections/records/e780051b-393f-4371-9312-a5d6f5859d04/3:285b/", "date": "1434", "address": "Mallorca", "lat": 39.6952629, "lng": 3.0175712 },
+          { "item": "ladder", "owner": "Iacobus de Consule", "description": "escalas duas facta[s] ad una, cum eius cathena de ferro", "location": "In the storeroom located in the Amalfitania district", "link": "https://dalme.org/collections/records/48302193-8248-47cd-ae04-9978f395fe8c/275/", "date": "1464", "address": "Messina", "lat": 38.1937342, "lng": 15.5542088 },
+          { "item": "ladder", "owner": "Hans Hasler", "description": "ein lange leiter", "location": "exterior", "link": "https://dalme.org/collections/records/89014f8b-15d5-45d5-abfb-703bbe79c628/43/", "date": "1477", "address": "Basel", "lat": 47.5595986, "lng": 7.5885761 },
+          { "item": "ladder", "owner": "Hans Hasler", "description": "ein winleiter", "location": "exterior", "link": "https://dalme.org/collections/records/89014f8b-15d5-45d5-abfb-703bbe79c628/43/", "date": "1477", "address": "Basel", "lat": 47.5595986, "lng": 7.588576 },
+          { "item": "ladder", "owner": "John Snelle", "description": "Item a ladder price iij d", "location": "in the kitchen", "link": "https://dalme.org/collections/records/60d49da1-f4a3-4094-bf38-d986f27b1a8a/1/", "date": "1496", "address": "Huntingdonshire", "lat": 52.3304927, "lng": -0.1865544 },
+          { "item": "ladder", "owner": "John Snelle", "description": "Item ij ladders price viij d", "location": "in the yard", "link": "https://dalme.org/collections/records/60d49da1-f4a3-4094-bf38-d986f27b1a8a/1/", "date": "1496", "address": "Huntingdonshire", "lat": 52.3304927, "lng": -0.1865542 }
+        ];
+
+        // Loop through data and add markers
+        ladderData.forEach(point => {
+            const popupContent = `
+                <div class="popup-title">${point.owner} (${point.date})</div>
+                <b>Item:</b> ${point.item}<br>
+                <b>Source:</b> <i>${point.description}</i><br>
+                <b>Location:</b> ${point.location}<br>
+                <b>Address:</b> ${point.address}<br>
+                <a href="${point.link}" target="_blank">View DALME Record</a>
+            `;
+
+            // Offset points slightly if they share the exact same coordinates
+            const lat = point.lat + (Math.random() - 0.5) * 0.0001;
+            const lng = point.lng + (Math.random() - 0.5) * 0.0001;
+
+            L.marker([lat, lng]).addTo(map)
+                .bindPopup(popupContent);
+        });
+    </script>
+</body>
+</html>
