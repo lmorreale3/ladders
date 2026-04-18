@@ -3,31 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DALME Ladder Map</title>
+    <title>DALME Ladder Time-Lapse</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         body { margin: 0; padding: 0; }
-        #map { height: 100vh; width: 100%; }
+        #map { height: 100vh; width: 100%; background: #a5bfdd; } /* Background color for water */
+        
+        /* Year Display Overlay */
+        #year-display {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px 20px;
+            font-family: 'Georgia', serif;
+            font-size: 24px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+
         .leaflet-popup-content-wrapper { font-family: sans-serif; }
         .popup-title { font-weight: bold; font-size: 1.1em; margin-bottom: 5px; }
     </style>
 </head>
 <body>
 
+    <div id="year-display">Year: 1347</div>
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <script>
-        // Initialize the map centered on Europe
+        // 1. Initialize map
         const map = L.map('map').setView([45, 10], 5);
 
-        // Add OpenStreetMap tile layer
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
+        // 2. Add Geographic-only Base Map (Esri World Physical)
+        // This layer shows terrain/mountains but NO labels or borders.
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri &mdash; Source: US National Park Service',
+            maxZoom: 8
         }).addTo(map);
 
-        // Your CSV Data transformed into a JSON array
         const ladderData = [
           { "item": "ladder", "owner": "Guillelmus Egidii", "description": "una scale fuste", "location": "in the upper room of the house", "link": "https://dalme.org/collections/records/30904c6f-334d-470d-adcb-30d003f6aa69/114r/", "date": "1347", "address": "Marseille", "lat": 43.3025742, "lng": 5.3690743 },
           { "item": "ladder", "owner": "Berengarius de Bulbono", "description": "una parva scala ad assendendum supra tinam", "location": "above the roof", "link": "https://dalme.org/collections/records/9e7b8e5b-681b-41ab-8818-6e8894ced204/10r/", "date": "1361", "address": "Arles", "lat": 43.676647, "lng": 4.6277769 },
@@ -50,24 +68,43 @@
           { "item": "ladder", "owner": "John Snelle", "description": "Item ij ladders price viij d", "location": "in the yard", "link": "https://dalme.org/collections/records/60d49da1-f4a3-4094-bf38-d986f27b1a8a/1/", "date": "1496", "address": "Huntingdonshire", "lat": 52.3304927, "lng": -0.1865542 }
         ];
 
-        // Loop through data and add markers
-        ladderData.forEach(point => {
-            const popupContent = `
-                <div class="popup-title">${point.owner} (${point.date})</div>
-                <b>Item:</b> ${point.item}<br>
-                <b>Source:</b> <i>${point.description}</i><br>
-                <b>Location:</b> ${point.location}<br>
-                <b>Address:</b> ${point.address}<br>
-                <a href="${point.link}" target="_blank">View DALME Record</a>
-            `;
+        // 3. Sort data chronologically
+        ladderData.sort((a, b) => parseInt(a.date) - parseInt(b.date));
 
-            // Offset points slightly if they share the exact same coordinates
-            const lat = point.lat + (Math.random() - 0.5) * 0.0001;
-            const lng = point.lng + (Math.random() - 0.5) * 0.0001;
+        const yearBox = document.getElementById('year-display');
+        let index = 0;
 
-            L.marker([lat, lng]).addTo(map)
-                .bindPopup(popupContent);
-        });
+        // 4. Time-lapse function
+        function addMarkerSequentially() {
+            if (index < ladderData.length) {
+                const point = ladderData[index];
+                
+                // Update Year Display
+                yearBox.innerHTML = `Year: ${point.date}`;
+
+                const popupContent = `
+                    <div class="popup-title">${point.owner} (${point.date})</div>
+                    <b>Item:</b> ${point.item}<br>
+                    <b>Source:</b> <i>${point.description}</i><br>
+                    <b>Location:</b> ${point.location}<br>
+                    <b>Address:</b> ${point.address}<br>
+                    <a href="${point.link}" target="_blank">View DALME Record</a>
+                `;
+
+                const lat = point.lat + (Math.random() - 0.5) * 0.005;
+                const lng = point.lng + (Math.random() - 0.5) * 0.005;
+
+                L.marker([lat, lng]).addTo(map).bindPopup(popupContent);
+
+                index++;
+                // 800ms delay between markers
+                setTimeout(addMarkerSequentially, 800); 
+            }
+        }
+
+        // Start the sequence
+        addMarkerSequentially();
+
     </script>
 </body>
 </html>
