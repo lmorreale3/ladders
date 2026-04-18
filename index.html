@@ -3,25 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DALME Ladder Time-Lapse</title>
+    <title>DALME Ladder Map - European Focus</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        body { margin: 0; padding: 0; }
-        #map { height: 100vh; width: 100%; background: #a5bfdd; } /* Background color for water */
+        body { margin: 0; padding: 0; background: #a5bfdd; }
+        #map { height: 100vh; width: 100%; }
         
-        /* Year Display Overlay */
+        /* Time-lapse UI */
         #year-display {
             position: absolute;
             top: 20px;
             right: 20px;
             z-index: 1000;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 10px 20px;
-            font-family: 'Georgia', serif;
-            font-size: 24px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 25px;
+            font-family: 'Times New Roman', serif;
+            font-size: 28px;
+            font-weight: bold;
+            border-radius: 8px;
+            border: 2px solid #555;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            pointer-events: none; /* Allows clicking through the box if needed */
         }
 
         .leaflet-popup-content-wrapper { font-family: sans-serif; }
@@ -30,19 +32,29 @@
 </head>
 <body>
 
-    <div id="year-display">Year: 1347</div>
+    <div id="year-display">Preparing...</div>
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <script>
-        // 1. Initialize map
-        const map = L.map('map').setView([45, 10], 5);
+        // 1. SET BOUNDARIES (Europe & Mediterranean only)
+        const southWest = L.latLng(30, -15); 
+        const northEast = L.latLng(62, 40); // Stops near Turkey/Russia border
+        const bounds = L.latLngBounds(southWest, northEast);
 
-        // 2. Add Geographic-only Base Map (Esri World Physical)
-        // This layer shows terrain/mountains but NO labels or borders.
+        // 2. INITIALIZE MAP
+        const map = L.map('map', {
+            center: [45, 12],
+            zoom: 5,
+            minZoom: 4,
+            maxBounds: bounds,
+            maxBoundsViscosity: 1.0 
+        });
+
+        // 3. GEOGRAPHIC BASE MAP (No labels, no political borders)
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}', {
-            attribution: 'Tiles &copy; Esri &mdash; Source: US National Park Service',
+            attribution: 'Tiles &copy; Esri &mdash; Source: US NPS',
             maxZoom: 8
         }).addTo(map);
 
@@ -68,18 +80,18 @@
           { "item": "ladder", "owner": "John Snelle", "description": "Item ij ladders price viij d", "location": "in the yard", "link": "https://dalme.org/collections/records/60d49da1-f4a3-4094-bf38-d986f27b1a8a/1/", "date": "1496", "address": "Huntingdonshire", "lat": 52.3304927, "lng": -0.1865542 }
         ];
 
-        // 3. Sort data chronologically
+        // 4. CHRONOLOGICAL SORT
         ladderData.sort((a, b) => parseInt(a.date) - parseInt(b.date));
 
         const yearBox = document.getElementById('year-display');
         let index = 0;
 
-        // 4. Time-lapse function
+        // 5. SEQUENTIAL PLAYER FUNCTION
         function addMarkerSequentially() {
             if (index < ladderData.length) {
                 const point = ladderData[index];
                 
-                // Update Year Display
+                // Update Year Box
                 yearBox.innerHTML = `Year: ${point.date}`;
 
                 const popupContent = `
@@ -91,19 +103,21 @@
                     <a href="${point.link}" target="_blank">View DALME Record</a>
                 `;
 
-                const lat = point.lat + (Math.random() - 0.5) * 0.005;
-                const lng = point.lng + (Math.random() - 0.5) * 0.005;
+                // Slight random jitter for markers in the same city
+                const lat = point.lat + (Math.random() - 0.5) * 0.05;
+                const lng = point.lng + (Math.random() - 0.5) * 0.05;
 
                 L.marker([lat, lng]).addTo(map).bindPopup(popupContent);
 
                 index++;
-                // 800ms delay between markers
-                setTimeout(addMarkerSequentially, 800); 
+                setTimeout(addMarkerSequentially, 1000); // 1 second delay
+            } else {
+                yearBox.innerHTML = "Timeline Complete";
             }
         }
 
-        // Start the sequence
-        addMarkerSequentially();
+        // Start animation after a short delay so the map tiles can load
+        setTimeout(addMarkerSequentially, 1500);
 
     </script>
 </body>
